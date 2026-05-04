@@ -4,9 +4,14 @@ import tkinter.messagebox, tkinter.filedialog
 import subprocess
 import threading
 import os
+import sys
 
 # 基本設定
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+if getattr(sys, "frozen", False):
+    BASE_DIR = os.path.dirname(sys.executable)
+
+else:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # yt-dlp設定選項
 YTDLP_OPTIONS = {

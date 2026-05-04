@@ -1,4 +1,5 @@
 import tkinter as tk
+import tkinter.ttk as ttk
 import tkinter.messagebox, tkinter.filedialog
 import subprocess
 import threading
@@ -7,22 +8,29 @@ import os
 # 基本設定
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-BASE_SETTINGS = [
-    "--force-ipv4",
-    "--concurrent-fragments 8",
-    "--part",
-    "--continue",
-    "--throttled-rate 200K",
-    "--retries 10",
-]
-
 # yt-dlp設定選項
 YTDLP_OPTIONS = {
     "儲存影片縮圖": "--embed-thumbnail",
     "儲存影片資訊 (Metadata)": "--add-metadata",
     "轉碼成MP4": "--merge-output-format mp4",
     "以H.264編碼": "-S vcodec:h264",
+    "僅儲存音訊": "--extract-audio",
+    "轉碼成MP3": "--audio-format mp3",
 }
+
+# 支援Cookies的瀏覽器
+BROWSER = [
+    "不允許",
+    "brave",
+    "chrome",
+    "chromium",
+    "edge",
+    "firefox",
+    "opera",
+    "safari",
+    "vivaldi",
+    "whale",
+]
 
 
 def download():
@@ -49,6 +57,7 @@ def download():
         if var.get():
             cmd.extend(YTDLP_OPTIONS[label_text].split())
 
+    # 下載位址
     if download_location_var.get():
         cmd.extend(
             ["--output", os.path.join(download_location_var.get(), "%(title)s.%(ext)s")]
@@ -56,6 +65,10 @@ def download():
 
     else:
         cmd.extend(["--output", os.path.join(BASE_DIR, "%(title)s.%(ext)s")])
+
+    # 瀏覽器Cookies
+    if Cookies_combobox.get() != "不允許":
+        cmd.extend(["--cookies-from-browser", Cookies_combobox.get()])
 
     cmd.append(URL)
 
@@ -91,47 +104,61 @@ def browse_location():
 
 
 # 主視窗
-win = tk.Tk()
-win.geometry("")
-win.title("yt-dlp GUI")
+root = tk.Tk()
+root.geometry("")
+root.title("yt-dlp GUI")
 
 # YouTube網址輸入
-URL_label = tk.Label(win, text="請輸入你要下載的YouTube影片網址：")
+URL_label = tk.Label(root, text="請輸入你要下載的YouTube影片網址：")
 URL_label.pack(anchor="w", padx=20, pady=5)
 
 URL_var = tk.StringVar()
-URL_entry = tk.Entry(win, width=50, textvariable=URL_var)
+URL_entry = tk.Entry(root, width=50, textvariable=URL_var)
 URL_entry.pack(anchor="w", padx=20)
 
 # 排版空行
-tk.Label(win, text="").pack()
+tk.Label(root, text="").pack()
 
 # checkbox
 options_vars = {}
 
 for label_text, ytdlp_command in YTDLP_OPTIONS.items():
     var = tk.BooleanVar()
-    checkbox = tk.Checkbutton(win, text=label_text, variable=var)
+    checkbox = tk.Checkbutton(root, text=label_text, variable=var)
     checkbox.pack(anchor="w", padx=20, pady=2)
     options_vars[label_text] = var
 
 # 排版空行
-tk.Label(win, text="").pack()
+tk.Label(root, text="").pack()
+
+# 瀏覽器Cookies
+Cookies_label = tk.Label(
+    root,
+    text="如果需要使用瀏覽器Cookies，請選擇：\n（可以下載會員限定影片）",
+    justify="left",
+)
+Cookies_label.pack(anchor="w", padx=20)
+
+Cookies_combobox = ttk.Combobox(root, values=BROWSER, state="readonly")
+Cookies_combobox.pack(anchor="w", padx=20)
+Cookies_combobox.current(0)
+
+# 排版空行
+tk.Label(root, text="").pack()
 
 # 瀏覽下載檔案位址
-
-download_location_label = tk.Label(win, text="下載檔案將儲存在：")
+download_location_label = tk.Label(root, text="下載檔案將儲存在：")
 download_location_label.pack(anchor="w", padx=20)
 
 download_location_var = tk.StringVar()
-download_location_entry = tk.Entry(win, width=50, textvariable=download_location_var)
+download_location_entry = tk.Entry(root, width=50, textvariable=download_location_var)
 download_location_entry.pack(anchor="w", padx=20)
 
-browse_location_button = tk.Button(win, text="瀏覽", command=browse_location)
+browse_location_button = tk.Button(root, text="瀏覽", command=browse_location)
 browse_location_button.pack(anchor="w", padx=20, pady=5)
 
 # 下載button
-download_button = tk.Button(win, text="下載", command=download, width=10, height=2)
+download_button = tk.Button(root, text="下載", command=download, width=10, height=2)
 download_button.pack(pady=10)
 
-win.mainloop()
+root.mainloop()

@@ -5,6 +5,7 @@ import subprocess
 import threading
 import os
 import sys
+import webbrowser
 
 # 基本設定
 if getattr(sys, "frozen", False):
@@ -27,12 +28,12 @@ YTDLP_OPTIONS = {
 BROWSER = [
     "不允許",
     "brave",
-    "chrome",
-    "chromium",
-    "edge",
+    # "chrome",
+    # "chromium",
+    # "edge",
     "firefox",
     "opera",
-    "safari",
+    # "safari",
     "vivaldi",
     "whale",
 ]
@@ -88,6 +89,7 @@ def download():
             # 隱藏cmd黑視窗
             si = subprocess.STARTUPINFO()
             si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+
             result = subprocess.run(cmd, check=True, text=True, startupinfo=si)
 
         except subprocess.CalledProcessError as e:
@@ -110,6 +112,11 @@ def download():
 def browse_location():
     download_location = tk.filedialog.askdirectory()
     download_location_var.set(download_location)
+
+
+# 點擊連結
+def open_url(event):
+    webbrowser.open_new(event)
 
 
 # 主視窗
@@ -151,6 +158,24 @@ Cookies_label.pack(anchor="w", padx=20)
 Cookies_combobox = ttk.Combobox(root, values=BROWSER, state="readonly")
 Cookies_combobox.pack(anchor="w", padx=20)
 Cookies_combobox.current(0)
+
+Cookies_info_label = tk.Label(
+    root,
+    text="※因yt-dlp的bug，暫時只開放少數幾種瀏覽器，詳情可至：",
+)
+Cookies_info_label.pack(anchor="w", padx=20)
+
+Cookies_url = tk.Label(
+    root,
+    text="https://github.com/yt-dlp/yt-dlp/issues/7271",
+    fg="blue",
+    cursor="hand2",
+    font=("Arial", 10, "underline"),
+)
+Cookies_url.pack(anchor="w", padx=20)
+Cookies_url.bind(
+    "<Button-1>", lambda e: open_url("https://github.com/yt-dlp/yt-dlp/issues/7271")
+)
 
 # 排版空行
 tk.Label(root, text="").pack()

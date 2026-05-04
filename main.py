@@ -84,7 +84,11 @@ def download():
 
         try:
             download_button.config(state=tk.DISABLED, text="下載中...")
-            result = subprocess.run(cmd, check=True, text=True)
+
+            # 隱藏cmd黑視窗
+            si = subprocess.STARTUPINFO()
+            si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            result = subprocess.run(cmd, check=True, text=True, startupinfo=si)
 
         except subprocess.CalledProcessError as e:
             tk.messagebox.showerror("錯誤", f"下載失敗：{e}")

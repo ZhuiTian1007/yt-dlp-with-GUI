@@ -188,7 +188,7 @@ download_location_var = tk.StringVar()
 download_location_entry = tk.Entry(root, width=50, textvariable=download_location_var)
 download_location_entry.pack(anchor="w", padx=20)
 
-browse_location_button = tk.Button(root, text="瀏覽", command=browse_location)
+browse_location_button = tk.Button(root, text="瀏覽...", command=browse_location)
 browse_location_button.pack(anchor="w", padx=20, pady=5)
 
 # 下載button
